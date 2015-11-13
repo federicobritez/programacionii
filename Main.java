@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,47 +9,19 @@ import java.util.Scanner;
 
 public class Main {
 	
-	public interface IGrafo {
 
-		public boolean esVacio();
-		
-		void borrarArista(int a, int b);
-
-		//Conecta el vetice A con el B
-		public  void agregarConexion(int vertexA, int vertexB);
-		
-		//Agrega peso a la arista que une A con B
-		public void setPesoArista(int vertA, int vertB, int peso);
-		 
-		//Devuelve el peso de la arista que une A con B
-		public int getPesoArista(int vertA, int vertB);
-		 
-		//Devuelve la cantidad de vertices existentes en el grafo
-		public int getCantVetices();
-		 
-		//Devuelve todos los vetices conectados con v
-		public List<Integer> getVerticesConectadosA(int v);
-		 
-		//Devuelve un lista de pares, que representa las aristas del grafo 
-		//public List<Pair> getAristas();
-			
-		
-	}
-	
-
-	
 	public class Dijkstra {
 		private Integer pesos[]; //Pesos del vertice raiz a  U
 		private List previos[]; //Vertice desde donde se accedio a U
 		private final int RAIZ;  //Vertice de partida
 
-		public Dijkstra(IGrafo g , int raiz){
+		public Dijkstra(GrafoConLista g , int raiz){
 			pesos = new Integer[g.getCantVetices()];
 			previos = new ArrayList[g.getCantVetices()];
 			RAIZ  = raiz;
 		}
 		
-		public void dijkstra(IGrafo g){
+		public void dijkstra(GrafoConLista g){
 			int r = RAIZ;
 			
 			//Arreglo booleando para marcar los verices visitados
@@ -165,7 +138,7 @@ public class Main {
 	}	
 	
 	
-	public class GrafoConLista implements IGrafo{
+	public class GrafoConLista {
 
 		private int iVertices;
 	    private List<Integer>[] adyacencia;
@@ -193,35 +166,35 @@ public class Main {
 	    }
 		
 	    
-		@Override
+
 		public boolean esVacio() {
 			return this.iVertices==0;
 		}
 
-		@Override
+
 		public void agregarConexion(int vertexA, int vertexB) {
 		     adyacencia[vertexA].add(vertexB);
 		     //Pair<Integer,Integer> arista = new Pair<Integer,Integer>(vertexA, vertexB);
 		     //aristas.add(arista);
 		}
 
-		@Override
+
 		public void setPesoArista(int vertA, int vertB, int peso) {
 			matAdy[vertA][vertB] = peso;
 			
 		}
 
-		@Override
+
 		public int getPesoArista(int vertA, int vertB) {
 	    	return matAdy[vertA][vertB];
 		}
 
-		@Override
+
 		public int getCantVetices() {
 			return this.iVertices;
 		}
 
-		@Override
+
 		public List<Integer> getVerticesConectadosA(int v) {
 			return adyacencia[v];
 		}
@@ -234,10 +207,9 @@ public class Main {
 		}
 		*/
 		
-		@Override
+
 		public void borrarArista(int a , int b){
 			if(adyacencia[a].size() > 0){
-
 				adyacencia[a].remove(new Integer(b));
 				// OBS:  si se hace  adyacencia[a].remove(b) remueve la posicion, no el elemento
 				// cuyo valor es b. Por eso crea un objeto Integer con el valor de b.
@@ -285,36 +257,46 @@ public class Main {
 				g.agregarConexion(vpadre, vhijo);
 				g.setPesoArista(vpadre, vhijo, peso);
 			}
-			
+			//Aplicamos dijkstra. Obtenemos los caminos mas cortos a todos los nodos
 			Dijkstra d = asp.new Dijkstra(g, origen);
 			
 			d.dijkstra(g);
 			
-			
+			//Ya tenemos los caminos. Puede haber más de uno pero con el mismo costo
 			ArrayList[] previos = (ArrayList[]) d.getPrevios(); 
 			
 			ArrayList<Integer> auxDestinos= new ArrayList<Integer>();
 			auxDestinos.add(destino); 
-			
+			//vamos desde el destino al origen
 			while(!auxDestinos.isEmpty()){
+				//Obtenemos el destino y lo borramos de la lista
 				int vDestino = auxDestinos.remove(0);
+				//buscamos los previos de nodo destino
 				ArrayList<Integer> auxPrev = previos[vDestino];
+				//Si tiene mas de uno, los agregamos a todos
 				auxDestinos.addAll(auxPrev);
+				
+				//Para todos los previos 
 				for(int v: auxPrev){
+					//borramos su conexión con el destino
 					g.borrarArista(v, vDestino);
 				}
 				
 			}
 			
+			//Ya tenemos el grafo sin los caminos minimos calculados
+			
+			//Aplicamos otra vez Dijkstra obtener si existe los caminos casi minimos
 			Dijkstra d2 = asp.new Dijkstra(g, origen);
 			
 			d2.dijkstra(g);
 			
 			Integer[] pesos =  d2.getPesos();
 			int nuevoCosto = pesos[destino];
+			//Si hay un camino al destino, entonces no es infinito (Max_value)
+			//Encolamos las respuestas...
 			if(nuevoCosto != Integer.MAX_VALUE){
 				respuestas.add(nuevoCosto);
-				//System.out.println(nuevoCosto);
 			}
 			else{
 				respuestas.add(-1);
@@ -323,6 +305,8 @@ public class Main {
 			}
 		}
 		
+		
+		//Damos las respuestas en orden. 
 		for(int r: respuestas){
 			System.out.println(r);
 		}
