@@ -232,6 +232,8 @@ public class Main {
 	
 	public static void main(String args[]) {
 		
+		long startTime = System.currentTimeMillis();
+		
 		Scanner s = new Scanner(System.in);
 
 		Main asp= new Main();
@@ -312,8 +314,7 @@ public class Main {
 		}
 		
 		s.close();
-		
+		System.out.println("Tiempo Transcurrido :" +  (System.currentTimeMillis() - startTime));
 	}
 
-}
-	
+}	  
